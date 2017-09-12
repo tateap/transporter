@@ -10,7 +10,7 @@
 #  rsync
 #  scp
 #  gridftp
-#  MPI
+#  mpi
 #  conduit
 #  CephFS
 #  ceph rados
@@ -25,16 +25,16 @@ formats = ["binary"]
 
 #for form in formats 
 #  print form
-tests = {"zeromq", "cephfs"}
+tests = {"mpi"} #, "zeromq", "cephfs"}
 # "cephfs"}
 files = {"testdata"}
 
 for f in files :
    for t in tests : 
        fo = open("testdata", "r")
-       print "Name of the file: ", fo.name
-       print "Closed or not : ", fo.closed
-       print "Opening mode : ", fo.mode
-       print "Softspace flag : ", fo.softspace
+       print ("Name of the file: ", fo.name)
+       print ("Closed or not : ", fo.closed)
+       print ("Opening mode : ", fo.mode)
+       print ("Softspace flag : ", fo.softspace)
        driver(t,fo)
        fo.close()
