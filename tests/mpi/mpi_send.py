@@ -9,7 +9,7 @@ from threading import Thread
 from mpi4py import MPI
 import time
 
-CHUNK_SIZE = 0 #250000
+CHUNK_SIZE = 250000
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -34,8 +34,8 @@ def mpi_send(file):
     chunk_id = 123
     while True:
       data = file.read(CHUNK_SIZE)
-      chunk_id = chunk_id + 1
       comm.send(data, dest = destrank, tag = chunk_id)
+      chunk_id = chunk_id + 1
       if not data:
         break
   else:
