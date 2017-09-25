@@ -10,9 +10,9 @@ from zhelpers import socket_set_hwm
 import zmq
 import time
 
-CHUNK_SIZE = 250000
+#CHUNK_SIZE = 250000
 
-def zeromq_send(file):
+def zeromq_send(file, chunksize=250000):
    start = time.time()
    ctxt = zmq.Context()
    start_port = 5555
@@ -49,7 +49,7 @@ def zeromq_send(file):
       if command != b"fetch":
           break
       while True:
-           data = file.read(CHUNK_SIZE)
+           data = file.read(chunksize)
            router.send_multipart([identity, data])
            if not data:
                break

@@ -9,14 +9,13 @@ def recv():
   comm = MPI.COMM_WORLD
   rank = comm.Get_rank()
   srcrank = 1-rank
-  print srcrank
-
 
   total = 0     # Total bytes received
   chunks = 0    # Total chunks received
   chunk_id = 123
 
   while True:
+    #print("Rank %d waiting for chunk id %d from rank %d" %(rank, chunk_id, srcrank))
     chunk = comm.recv(source=srcrank, tag = chunk_id)
     chunks = chunks + 1
     chunk_id = chunk_id + 1

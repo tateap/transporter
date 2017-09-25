@@ -5,7 +5,7 @@ import time
 
 import subprocess
 
-def cephfs_send(file):
+def cephfs_send(file,chunksize):
    start = time.time()
    lock = ['touch','/ceph/atate/transporter/lockfile']
    subprocess.call(lock)
