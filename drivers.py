@@ -10,7 +10,7 @@ import time
 import argparse
 
 
-def recv(tf,test,parser):
+def recv(tf,test,args):
   # use srun to run on the remote resource
 # has to spawn a new process to do so 
   if test != 'mpi':
@@ -21,9 +21,8 @@ def recv(tf,test,parser):
     from tests.mpi.recv import recv as mpi_recv
     mpi_recv()
 
-def send(tf,test,parser):
+def send(tf,test,args):
 
-    args = parser.parse_args()
     chunksize = args.chunksize
   # generic method calling (lifted from stackexchange)
 
@@ -38,7 +37,7 @@ def send(tf,test,parser):
 
     return
 
-def driver(test,tfile,parser):
+def driver(test,tfile,args):
   
   tf = tfile
   start = time.time()
@@ -47,13 +46,13 @@ def driver(test,tfile,parser):
   if test != 'mpi':
     # start the receiver in one thread
     ts = []
-    recv_thread = threading.Thread(target=recv(tf,test,parser))
+    recv_thread = threading.Thread(target=recv(tf,test,args))
     recv_thread.start()
     ts.append(recv_thread)
 
     # start the sender in another thread
 
-    send_thread = threading.Thread(target=send(tf,test,parser))
+    send_thread = threading.Thread(target=send(tf,test,args))
     send_thread.start()
     ts.append(send_thread)
 
@@ -66,10 +65,10 @@ def driver(test,tfile,parser):
     rank = comm.Get_rank()
     if rank==0:
       #print("%d sends" % rank)
-      send(tf,test,parser)
+      send(tf,test,args)
     else:
       #print("%d receives" %rank)
-      recv(tf,test,parser)
+      recv(tf,test,args)
 
 
   end = time.time()

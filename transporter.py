@@ -27,16 +27,18 @@ parser = argparse.ArgumentParser(description='Tests transport with different int
 parser.add_argument('--formats', '-f', help='comma-separated list of data formats to use', type=str, default='binary')
 parser.add_argument('--interfaces', '-i', help='comma-separated list of interfaces to use', type=str,default='mpi,zeromq,cephfs')
 parser.add_argument('--chunksize', type=int, default=250000, help='Size of chunks in which data is split, in bytes. Setting it to zero causes the whole data to be sent at once.')
+parser.add_argument('--files', '-F', help='comma-separated list of files to transfer', type=str, default='testdata')
 
 args=parser.parse_args()
 formats = args.formats.split(',')
 tests = args.interfaces.split(',')
+files = args.files.split(',')
 #for form in formats 
 #  print form
 
 #tests = {"mpi"} #, "zeromq", "cephfs"}
 # "cephfs"}
-files = {"testdata"}
+#files = {"testdata"}
 
 for f in files :
   for t in tests :
@@ -46,7 +48,7 @@ for f in files :
       print ("Closed or not : ", fo.closed)
       print ("Opening mode : ", fo.mode)
       print ("Softspace flag : ", fo.softspace)
-      driver(t,fo,parser)
+      driver(t,fo,args)
       fo.close()
     else:
       from mpi4py import MPI
@@ -58,8 +60,8 @@ for f in files :
         print ("Closed or not : ", fo.closed)
         print ("Opening mode : ", fo.mode)
         print ("Softspace flag : ", fo.softspace)
-        driver(t,fo,parser)
+        driver(t,fo,args)
         fo.close()
       else:
         fo = None
-        driver(t,fo,parser)
+        driver(t,fo,args)
