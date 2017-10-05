@@ -21,6 +21,7 @@ def zeromq_send(file, chunksize=250000):
    tasks[1] = (ctxt.socket(zmq.REP))
    tasks[1].bind("tcp://*:"+str(start_port))
 
+    
    # loop until client tells us it's done
    #try:
 
@@ -29,12 +30,15 @@ def zeromq_send(file, chunksize=250000):
   # file = open("testdata", "r")
 
    router = ctxt.socket(zmq.ROUTER)
+   print("Looping until client tells us it is done")
 
    # Default HWM is 1000, which will drop messages here
    # since we send more than 1,000 chunks of test data,
    # so set an infinite HWM as a simple, stupid solution:
    socket_set_hwm(router, 0)
    router.bind("tcp://*:6000")
+
+  
 
    while True:
    # First frame in each message is the sender identity
@@ -49,9 +53,15 @@ def zeromq_send(file, chunksize=250000):
       if command != b"fetch":
           break
       while True:
-           data = file.read(chunksize)
-           router.send_multipart([identity, data])
-           if not data:
-               break
+          if chunksize>0:
+              data = file.read(chunksize)
+              router.send_multipart([identity, data])
+              if not data:
+                break
+          else:
+              data = file.read()
+              router.send_multipart([identity, data])
+              if not data:
+                break
    end = time.time()
    print "ZeroMQ: Send time = %f "%(end-start)

@@ -1,5 +1,6 @@
 import zmq
 import time
+import os
 #from zhelpers import socket_set_hwm
 
 start = time.time()
@@ -7,12 +8,20 @@ ctxt = zmq.Context()
 
 #  Socket to talk to server
 socket = ctxt.socket(zmq.REQ)
-socket.connect("tcp://192.168.18.1:5555")
+
+router_ip = os.getenv('TRANSPORTER_ROUTER_IP', '127.0.0.1')
+socket_addr = "tcp://"+router_ip+":5555"
+print socket_addr
+
+socket.connect(socket_addr)
 
 socket.send(b"Analysis")
 
 dealer = ctxt.socket(zmq.DEALER)
-dealer.connect("tcp://192.168.18.1:6000")
+dealer_addr = "tcp://"+router_ip+":6000"
+print dealer_addr
+
+dealer.connect(dealer_addr)
 dealer.send(b"fetch")
 
 total = 0     # Total bytes received

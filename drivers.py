@@ -1,9 +1,9 @@
 
 import subprocess
-#from zeromq_send import zeromq_send
 #from cephfs_send import cephfs_send
 #from cephreados_send import cephrados_send
-from tests.mpi.mpi_send import mpi_send
+from tests.zeromq.zeromq_send import zeromq_send
+#from tests.mpi.mpi_send import mpi_send
 
 import threading
 import time
@@ -15,7 +15,7 @@ def recv(tf,test,args):
 # has to spawn a new process to do so 
   if test != 'mpi':
       srun = ['srun','-N1','--ntasks-per-node=1','python','./tests/'+str(test)+'/recv.py']
-      proc = subprocess.Popen(srun)
+      proc = subprocess.Popen(srun)#, stdout=subprocess.PIPE)
     # if we want to get back info from stdout, it will be ,stdout=subprocess.PIPE)
   else:
     from tests.mpi.recv import recv as mpi_recv
@@ -44,6 +44,7 @@ def driver(test,tfile,args):
 
 
   if test != 'mpi':
+
     # start the receiver in one thread
     ts = []
     recv_thread = threading.Thread(target=recv(tf,test,args))
