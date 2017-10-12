@@ -21,18 +21,23 @@
 
 from drivers import driver
 import argparse
+import os.path
 
 parser = argparse.ArgumentParser(description='Tests transport with different interfaces and data formats.')
 
-parser.add_argument('--formats', '-f', help='comma-separated list of data formats to use', type=str, default='binary')
+parser.add_argument('--format', '-f', help='data format to use, if \'auto\' is selected, transfer is set according to file extension', type=str, default='binary')
 parser.add_argument('--interfaces', '-i', help='comma-separated list of interfaces to use', type=str,default='mpi,zeromq,cephfs')
 parser.add_argument('--chunksize', type=int, default=250000, help='Size of chunks in which data is split, in bytes. Setting it to zero causes the whole data to be sent at once.')
 parser.add_argument('--files', '-F', help='comma-separated list of files to transfer', type=str, default='testdata')
 
 args=parser.parse_args()
-formats = args.formats.split(',')
 tests = args.interfaces.split(',')
 files = args.files.split(',')
+
+automatic_format = args.format == 'auto'
+  
+
+  
 #for form in formats 
 #  print form
 
@@ -41,9 +46,15 @@ files = args.files.split(',')
 #files = {"testdata"}
 
 for f in files :
+  if automatic_format:
+    extension = os.path.splitext(f)[1]
+    if extension == '.nc':
+      args.format = 'netcdf'
+    else:
+      args.format = 'binary'
   for t in tests :
     if t != 'mpi':
-      fo = open("testdata", "r")
+      fo = open(f, "r")
       print ("Name of the file: ", fo.name)
       print ("Closed or not : ", fo.closed)
       print ("Opening mode : ", fo.mode)
@@ -55,7 +66,7 @@ for f in files :
       comm = MPI.COMM_WORLD
       rank = comm.Get_rank()
       if rank==0:
-        fo = open("testdata", "r")
+        fo = open(f, "r")
         print ("Name of the file: ", fo.name)
         print ("Closed or not : ", fo.closed)
         print ("Opening mode : ", fo.mode)

@@ -8,11 +8,43 @@
 from threading import Thread
 from mpi4py import MPI
 import time
+import numpy as np
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
 destrank = 1-rank
+
+def mpi_send_netcdf(file, chunksize=250000):
+  start = time.time()
+
+  #loop until client tells us it's done
+  #try:
+
+  from netCDF4 import Dataset
+
+  print file.name
+
+  rootgrp = Dataset(file.name, 'r')
+
+  #hardcoding variable name for the moment being
+  data = rootgrp['sst'][:][:][:]
+
+  dimensions = np.ndim(data)
+
+  comm_tag = 101
+  comm.send(dimensions, dest = destrank, tag = comm_tag)
+
+  comm_tag = 102
+  comm.send(np.shape(data), dest = destrank, tag = comm_tag)
+
+  
+  
+  comm.send(data, dest = destrank, tag = 123)
+
+  end = time.time()
+  print("MPI: Send time = %f "%(end-start))
+  
 
 def mpi_send(file, chunksize=250000):
   start = time.time()

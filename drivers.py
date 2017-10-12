@@ -3,7 +3,7 @@ import subprocess
 #from cephfs_send import cephfs_send
 #from cephreados_send import cephrados_send
 from tests.zeromq.zeromq_send import zeromq_send
-#from tests.mpi.mpi_send import mpi_send
+from tests.mpi.mpi_send import mpi_send, mpi_send_netcdf
 
 import threading
 import time
@@ -13,13 +13,23 @@ import argparse
 def recv(tf,test,args):
   # use srun to run on the remote resource
 # has to spawn a new process to do so 
+  print test
   if test != 'mpi':
-      srun = ['srun','-N1','--ntasks-per-node=1','python','./tests/'+str(test)+'/recv.py']
-      proc = subprocess.Popen(srun)#, stdout=subprocess.PIPE)
+
+    method_suffix = ''
+    if args.format != 'binary':
+      method_suffix += '_' + args.format
+      
+    srun = ['srun','-N1','--ntasks-per-node=1','python','./tests/'+str(test)+'/recv'+str(method_suffix)+'.py']
+    proc = subprocess.Popen(srun)#, stdout=subprocess.PIPE)
     # if we want to get back info from stdout, it will be ,stdout=subprocess.PIPE)
   else:
-    from tests.mpi.recv import recv as mpi_recv
-    mpi_recv()
+    if args.format == 'binary':
+      from tests.mpi.recv import recv as mpi_recv
+      mpi_recv()
+    if args.format == 'netcdf':
+      from tests.mpi.recv_netcdf import recv as mpi_recv_netcdf
+      mpi_recv_netcdf()
 
 def send(tf,test,args):
 
@@ -27,6 +37,8 @@ def send(tf,test,args):
   # generic method calling (lifted from stackexchange)
 
     method_name = str(test)+'_send'
+    if args.format != 'binary':
+      method_name += '_' + args.format
     possibles = globals().copy()
     possibles.update(locals())
 
